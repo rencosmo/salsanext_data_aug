@@ -15,18 +15,20 @@ class Logger(object):
 
     def __init__(self, log_dir):
         """Create a summary writer logging to log_dir."""
-        self.writer = tf.summary.FileWriter(log_dir)
+        # self.writer = tf.summary.FileWriter(log_dir)
+        self.writer = SummaryWriter(log_dir)
 
     def scalar_summary(self, tag, value, step):
         """Log a scalar variable."""
-        summary = tf.Summary(
-            value=[tf.Summary.Value(tag=tag, simple_value=value)])
-        self.writer.add_summary(summary, step)
-        self.writer.flush()
+        # summary = tf.Summary(
+        #     value=[tf.Summary.Value(tag=tag, simple_value=value)])
+        # self.writer.add_summary(summary, step)
+        # self.writer.flush()
+        self.writer.add_scalar(tag, value, step)
 
     def image_summary(self, tag, images, step):
         """Log a list of images."""
-
+        '''
         img_summaries = []
         for i, img in enumerate(images):
             # Write the image to a string
@@ -48,11 +50,14 @@ class Logger(object):
         summary = tf.Summary(value=img_summaries)
         self.writer.add_summary(summary, step)
         self.writer.flush()
+        '''
+        self.writer.add_images(tag, images, step, dataformats='NHWC')
 
     def histo_summary(self, tag, values, step, bins=1000):
         """Log a histogram of the tensor of values."""
 
         # Create a histogram using numpy
+        '''
         counts, bin_edges = np.histogram(values, bins=bins)
 
         # Fill the fields of the histogram proto
@@ -76,3 +81,5 @@ class Logger(object):
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
         self.writer.add_summary(summary, step)
         self.writer.flush()
+        '''
+        self.writer.add_histogram(tag, values, max_bins=bins)

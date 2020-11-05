@@ -70,7 +70,8 @@ class SemanticKitti(Dataset):
                sensor,              # sensor to parse scans from
                max_points=150000,   # max number of points present in dataset
                gt=True,
-               transform=False):            # send ground truth?
+               transform=False,
+               model_injection=True):            # send ground truth?
     # save deats
     self.root = os.path.join(root, "sequences")
     self.sequences = sequences
@@ -90,6 +91,7 @@ class SemanticKitti(Dataset):
     self.max_points = max_points
     self.gt = gt
     self.transform = transform
+    self.model_injection = model_injection
 
     # get number of classes (can't be len(self.learning_map) because there
     # are multiple repeated entries, so the number that matters is how many
@@ -196,7 +198,7 @@ class SemanticKitti(Dataset):
 
     # open and obtain scan
     # data augmentation, inject points and labels
-    scan.open_scan_label_dataaug(scan_file, label_file)
+    scan.open_scan_label_dataaug(scan_file, label_file, self.model_injection)
     scan.open_scan()
     if self.gt:
       scan.open_label()
@@ -326,7 +328,8 @@ class Parser():
                                        sensor=self.sensor,
                                        max_points=max_points,
                                        transform=True,
-                                       gt=self.gt)
+                                       gt=self.gt,
+                                       model_injection=True)
 
     self.trainloader = torch.utils.data.DataLoader(self.train_dataset,
                                                    batch_size=self.batch_size,
@@ -344,7 +347,8 @@ class Parser():
                                        learning_map_inv=self.learning_map_inv,
                                        sensor=self.sensor,
                                        max_points=max_points,
-                                       gt=self.gt)
+                                       gt=self.gt,
+                                       model_injection=False)  # do not inject any model into valid set
 
     self.validloader = torch.utils.data.DataLoader(self.valid_dataset,
                                                    batch_size=self.batch_size,
@@ -363,7 +367,8 @@ class Parser():
                                         learning_map_inv=self.learning_map_inv,
                                         sensor=self.sensor,
                                         max_points=max_points,
-                                        gt=False)
+                                        gt=False,
+                                        model_injection=False)  # do not inject any model into test set
 
       self.testloader = torch.utils.data.DataLoader(self.test_dataset,
                                                     batch_size=self.batch_size,

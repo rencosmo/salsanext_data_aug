@@ -220,7 +220,7 @@ class SemLaserScan(LaserScan):
         # force zero to a gray-ish color
         self.inst_color_lut[0] = np.full((3), 0.1)
 
-    def open_scan_label_dataaug(self, scan_file, label_file):
+    def open_scan_label_dataaug(self, scan_file, label_file, injection=True):
         # check filename is string
         if not isinstance(scan_file, str):
             raise TypeError("Filename should be string type, "
@@ -249,14 +249,17 @@ class SemLaserScan(LaserScan):
         inst_label = label >> 16  # instance id in upper half
 
         # data augmentation, inject object models
-        bb_dim = 1.0
-        model_label = 30
-        model_num = 1
-        model_path = "/dataaug/person/"
-        scan_aug, label_aug = data_aug.injectObj(scan, sem_label, model_path, model_label, bb_dim, model_num, [40, 44, 48], [0.05, 0.05, 0.9])
-        
-        self.scan_aug = scan_aug
-        self.label_aug = label_aug
+        if injection:
+            bb_dim = 1.0
+            model_label = 30
+            model_num = 1
+            model_path = "/home/cosmo/workspace/dataaug/person/"
+            scan_aug, label_aug = data_aug.injectObj(scan, sem_label, model_path, model_label, bb_dim, model_num, [40, 44, 48], [0.05, 0.05, 0.9])
+            self.scan_aug = scan_aug
+            self.label_aug = label_aug
+        else:
+            self.scan_aug = scan
+            self.label_aug = label        	
 
         # data_aug.scan_display(scan_aug, label_aug)
     
