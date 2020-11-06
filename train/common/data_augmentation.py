@@ -108,6 +108,8 @@ def injectObj(scan, label, model_path, model_label, bb_dim, model_num, freeSpace
         if model_index[0].shape[0]>0:
           model_num = np.random.choice(model_index[0], 1) # chosen a model
           cluster = np.load(model_path+model_names[model_num[0]]) # load model
+          if np.random.random_sample()<0.5:  # left-right flip 50% models 
+            cluster[:, 0] = -cluster[:, 0]
           cluster_trans, cluster_label = cluster_translate(cluster, anchor, model_label)
           scan = np.vstack((scan, cluster_trans))
           label = np.hstack((label, cluster_label))
